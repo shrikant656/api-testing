@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employees API Demo (json-server)</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; padding: 24px; background: #0f172a; color: #e2e8f0; }
+    h1 { margin-top: 0; }
+    .card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    label { display: inline-block; min-width: 64px; color: #93c5fd; }
+    input { background: #0b1220; color: #e2e8f0; border: 1px solid #334155; border-radius: 8px; padding: 8px 10px; }
+    button { background: #2563eb; border: 0; color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+    button.secondary { background: #10b981; }
+    button.warn { background: #ef4444; }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+    pre { background: #0b1220; color: #e5e7eb; border-radius: 10px; padding: 12px; overflow: auto; border: 1px solid #334155; }
+    code { color: #a7f3d0; }
+    .hint { color: #9ca3af; }
+  </style>
+  <script>
+    const baseUrl = ''; // same-origin (served by json-server)
+
+    function setBusy(isBusy) {
+      for (const btn of document.querySelectorAll('button[data-action]')) {
+        btn.disabled = isBusy;
+      }
+    }
+
+    async function handle(action) {
+      const id = document.getElementById('id').value.trim();
+      const name = document.getElementById('name').value.trim();
+      const role = document.getElementById('role').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const out = document.getElementById('output');
+      setBusy(true);
+      try {
+        let res;
+        if (action === 'getAll') {
+          res = await fetch(`${baseUrl}/employees`);
+        } else if (action === 'getById') {
+          if (!id) throw new Error('Provide id');
+          res = await fetch(`${baseUrl}/employees/${encodeURIComponent(id)}`);
+        } else if (action === 'post') {
+          const body = { name, role, email };
+          res = await fetch(`${baseUrl}/employees`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        } else if (action === 'put') {
+          if (!id) throw new Error('Provide id');
+          const body = { name, role, email };
+          res = await fetch(`${baseUrl}/employees/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        } else if (action === 'patch') {
+          if (!id) throw new Error('Provide id');
+          const patch = {};
+          if (name) patch.name = name;
+          if (role) patch.role = role;
+          if (email) patch.email = email;
+          if (Object.keys(patch).length === 0) throw new Error('Provide at least one field to patch');
+          res = await fetch(`${baseUrl}/employees/${encodeURIComponent(id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(patch) });
+        } else if (action === 'delete') {
+          if (!id) throw new Error('Provide id');
+          res = await fetch(`${baseUrl}/employees/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        } else {
+          throw new Error('Unknown action');
+        }
+
+        const text = await res.text();
+        let json;
+        try { json = JSON.parse(text); } catch { json = text; }
+        out.textContent = JSON.stringify({ status: res.status, ok: res.ok, data: json }, null, 2);
+      } catch (err) {
+        out.textContent = JSON.stringify({ error: String(err) }, null, 2);
+      } finally {
+        setBusy(false);
+      }
+    }
+  </script>
+  </head>
+<body>
+  <h1>Employees API Demo</h1>
+  <div class="card">
+    <div class="row" style="margin-bottom: 8px;">
+      <label for="id">id</label>
+      <input id="id" type="text" placeholder="e.g. 1" />
+      <label for="name">name</label>
+      <input id="name" type="text" placeholder="e.g. Jane Doe" />
+      <label for="role">role</label>
+      <input id="role" type="text" placeholder="e.g. QA" />
+      <label for="email">email</label>
+      <input id="email" type="email" placeholder="e.g. jane@example.com" />
+    </div>
+    <div class="row">
+      <button data-action="getAll" onclick="handle('getAll')">GET /employees</button>
+      <button data-action="getById" onclick="handle('getById')">GET /employees/:id</button>
+      <button class="secondary" data-action="post" onclick="handle('post')">POST /employees</button>
+      <button class="secondary" data-action="put" onclick="handle('put')">PUT /employees/:id</button>
+      <button class="secondary" data-action="patch" onclick="handle('patch')">PATCH /employees/:id</button>
+      <button class="warn" data-action="delete" onclick="handle('delete')">DELETE /employees/:id</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="hint">Responses will appear here:</div>
+    <pre id="output">{ "status": 0, "ok": false, "data": null }</pre>
+  </div>
+
+  <div class="card">
+    <div class="hint">Quick examples (copy into Postman):</div>
+    <pre><code>GET     http://localhost:3001/employees
+GET     http://localhost:3001/employees/1
+POST    http://localhost:3001/employees
+Body:   { "name": "Jane Doe", "role": "QA", "email": "jane@example.com" }
+
+PUT     http://localhost:3001/employees/1
+Body:   { "name": "Alice Johnson", "role": "Lead Developer", "email": "alice@example.com" }
+
+PATCH   http://localhost:3001/employees/1
+Body:   { "role": "Senior Developer" }
+
+DELETE  http://localhost:3001/employees/2</code></pre>
+  </div>
+
+  <div class="hint">This page is served by json-server from <code>./public/index.html</code>.</div>
+</body>
+</html>
+
+
