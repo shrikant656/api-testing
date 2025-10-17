@@ -7,12 +7,16 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "json-server --watch server.json --port 3001",
     "start:delay": "json-server --watch server.json --port 3001 --delay 500",
-    "start:routes": "json-server --watch server.json --port 3001 --routes routes.json"
+    "start:routes": "json-server --watch server.json --port 3001 --routes routes.json",
+    "build": "echo Skipping build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
     "json-server": "^1.0.0-beta.3"
   }
