@@ -50,3 +50,9 @@ tmp/
 temp/
 
 
+# Netlify
+.netlify/
+netlify/functions-serve/
+netlify-*.log
+
+

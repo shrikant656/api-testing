@@ -3,8 +3,8 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "routes": [
-    { "src": "/employees$", "dest": "https://api-testing-three-pearl.vercel.app/employees" },
-    { "src": "/employees/(.*)", "dest": "https://api-testing-three-pearl.vercel.app/employees/$1" },
+    { "src": "/employees$", "dest": "https://YOUR-NETLIFY-SITE.netlify.app/.netlify/functions/employees" },
+    { "src": "/employees/(.*)", "dest": "https://YOUR-NETLIFY-SITE.netlify.app/.netlify/functions/employees/$1" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/public/$1" }
   ]

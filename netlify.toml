@@ -1,0 +1,17 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/employees"
+  to = "/.netlify/functions/employees"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/employees/*"
+  to = "/.netlify/functions/employees/:splat"
+  status = 200
+  force = true
+
+
