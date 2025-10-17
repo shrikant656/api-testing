@@ -25,8 +25,12 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return json(200, {});
 
   const { httpMethod, path } = event;
-  const base = '/.netlify/functions/employees';
-  const idMatch = path.startsWith(base + '/') ? path.slice(base.length + 1) : null;
+  const idMatch = (() => {
+    // Support both direct function path and redirected clean path
+    // e.g. '/.netlify/functions/employees/1' or '/employees/1'
+    const m = /\/employees\/(.+)$/.exec(path);
+    return m && m[1] ? m[1] : null;
+  })();
 
   try {
     if (httpMethod === 'GET' && !idMatch) {
@@ -64,7 +68,7 @@ exports.handler = async (event) => {
     if (httpMethod === 'DELETE' && idMatch) {
       const existing = employees.some(e => e.id === idMatch);
       employees = employees.filter(e => e.id !== idMatch);
-      return existing ? json(204, {}) : json(404, { message: 'Not found' });
+      return existing ? json(200, { message: 'Deleted' }) : json(404, { message: 'Not found' });
     }
 
     return json(405, { message: 'Method Not Allowed' });
