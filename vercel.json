@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "routes": [
+    { "src": "/employees$", "dest": "https://api-testing-three-pearl.vercel.app/employees" },
+    { "src": "/employees/(.*)", "dest": "https://api-testing-three-pearl.vercel.app/employees/$1" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ]
+}
+
+
